@@ -11,45 +11,18 @@ import {
 import { useCountdown } from "../../hooks/useCountdown";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
-import type { OTPVerificationResponse } from "../../auth.types";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export const SignUpOTPForm = () => {
     const [code, setCode] = useState("");
     const nav = useRouter();
-
     const { secondsLeft, startTimer } = useCountdown(60);
-    const { mutate: verifyCode } = useMutation({
-        mutationFn: async (event: FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            if (secondsLeft > 0) return;
-            const promise = api.post<OTPVerificationResponse>(`/api/v1/auth/signup/otp/verify`, {
-                code
-            })
-            toast.promise(promise, {
-                loading: "Verifying your email...",
-                error: "Invalid or expired verification code. Please try again.",
-                success: "Email verified successfully! Your account is ready.",
-            });
-            const res = await promise;
-            startTimer();
-            return res.data;
-        },
-        onSuccess: (data) => {
-            console.log('data', data);
-            if (!data || !data.success) return;
-            if (data.redirect && data.redirectTo) {
-                nav.push(data.redirectTo);
-            }
-        }
-    })
 
 
     return (
         <form
             id="otp-form"
-            onSubmit={(e) => verifyCode(e)}
+            onSubmit={(e) => console.log('otp!')}
             className="flex flex-col items-center gap-6 bg-transparent text-center text-neutral-100"
         >
 

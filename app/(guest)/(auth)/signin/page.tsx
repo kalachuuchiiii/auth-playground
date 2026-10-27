@@ -10,61 +10,29 @@ import { Button } from "@/components/ui/button"
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa"
 import { Marker, MarkerContent } from "@/components/ui/marker"
-import { useAuthForm } from "@/features/auth/hooks/useAuthForm"
-import { signInFormSchema, type AuthForm } from "@/features/auth/schemas"
 import Link from "next/link"
 import { FirePatchLockUp } from "@/components/ui/FirePatchLockUp"
-import { useMutation } from "@tanstack/react-query"
 import { signIn } from "next-auth/react"
-import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
 
 const SignIn = () => {
-    const form = useAuthForm(signInFormSchema);
+
     const nav = useRouter();
-    const { mutate: signMeIn, isPending } = useMutation({
-        mutationFn: async ({ email, password }: AuthForm) => {
-            const promise = signIn('credentials', {
-                email,
-                password,
-                redirect: false
-            }).then((result) => {
-                if (!result || result.error) {
-                    throw new Error("Invalid email or password.");
-                }
 
-                return result;
-            });
-
-            toast.promise(promise, {
-                loading: "Signing in...",
-                success: "Signed in successfully!",
-                error: (error) => error.message ?? "Something went wrong. Please try again.",
-            });
-            const result = await promise;
-            return result;
-        },
-        onSuccess: (result) => {
-            if (result.ok) {
-                nav.replace('/');
-            }
-        }
-    })
 
     return (
         <div className="w-6/12 mx-auto gap-6 h-full text-neutral-900 dark:text-neutral-100 flex flex-col items-center justify-center">
             <FirePatchLockUp width={100} />
             <form
                 id="signin-form"
-
-                onSubmit={form.handleSubmit((values) => signMeIn(values))}
+                onSubmit={() => console.log('sign in')}
                 className="w-full max-w-md space-y-6"
                 noValidate
             >
                 <Controller
                     name="email"
-                    control={form.control}
+
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>
@@ -73,7 +41,7 @@ const SignIn = () => {
 
 
                             <Input
-                                disabled={isPending}
+
                                 {...field}
                                 id={field.name}
                                 type="email"
@@ -96,14 +64,14 @@ const SignIn = () => {
 
                 <Controller
                     name="password"
-                    control={form.control}
+
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                             <FieldLabel htmlFor={field.name}>
                                 Password
                             </FieldLabel>
                             <Input
-                                disabled={isPending}
+
                                 {...field}
                                 id={field.name}
                                 type="password"
@@ -129,11 +97,9 @@ const SignIn = () => {
                         form="signin-form"
                         type="submit"
                         className="w-full"
-                        disabled={isPending}
+
                     >
-                        {isPending
-                            ? "Signing you in..."
-                            : "Sign-in"}
+                        Signing you in...
                     </Button>
                     <Marker className="my-2" variant={'separator'}>
 
@@ -147,7 +113,7 @@ const SignIn = () => {
                             type="button"
                             variant={'outline'}
                             className="w-6/12 "
-                            disabled={form.formState.isSubmitting}
+
                         >
 
                             <FcGoogle />  Google
@@ -159,7 +125,7 @@ const SignIn = () => {
                             variant={'outline'}
                             type="button"
                             className="w-6/12"
-                            disabled={form.formState.isSubmitting}
+
                         >
 
                             <FaGithub />  GitHub

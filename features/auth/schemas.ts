@@ -25,7 +25,7 @@ export const codeSchema = z
     .string()
     .length(6)
     .regex(/^\d{6}$/, "Code must be exactly 6 digits.");
-export type SignUpFormSchema = typeof signUpFormSchema;
-export type SignInFormSchema = typeof signInFormSchema;
-export type AuthForm = z.infer<typeof signInFormSchema>;
+export type SignUpForm = z.infer<typeof signUpFormSchema>;
+export type SignInForm = z.infer<typeof signInFormSchema>;
+
 
