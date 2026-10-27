@@ -22,6 +22,7 @@ import { api } from "@/lib/axios"
 import { useMutation } from "@tanstack/react-query"
 import { SignUpOTPForm } from "@/features/auth/components/molecules/SignUpOTPForm"
 import type { OTPVerificationResponse, SendSignupOtpResponse } from "@/features/auth/auth.types"
+import { toast, Toaster } from "sonner"
 
 
 const SignUp = () => {
@@ -30,7 +31,12 @@ const SignUp = () => {
 
     const { mutate: onSubmit, data } = useMutation({
         mutationFn: async (values: AuthForm) => {
-            const promise = api.post<SendSignupOtpResponse>('/api/v1/auth/signup/otp', values)
+            const promise = api.post<SendSignupOtpResponse>('/api/v1/auth/signup/otp', values);
+            toast.promise(promise, {
+                loading: "Sending verification code...",
+                success: "Verification code sent! Check your email.",
+                error: "Failed to send verification code. Please try again.",
+            });
             return (await promise).data;
         }
     })

@@ -1,10 +1,11 @@
+import { Toaster } from "sonner";
 
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     const methods = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'];
     return (
         <div className="w-full relative dark bg-stone-900 flex min-h-screen h-full">
-
+            <Toaster position="bottom-right" />
             <div className=" flex flex-col h-full items-start justify-center text-neutral-100 w-6/12  ">
 
                 <div className=" w-10/12 z-200 mx-auto ">

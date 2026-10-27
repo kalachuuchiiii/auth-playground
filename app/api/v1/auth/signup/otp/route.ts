@@ -23,7 +23,7 @@ export const POST = catchErrors<SendSignupOtpResponse>(async (req: NextRequest) 
         .toString()
         .padStart(6, "0");
 
-    const [hashedCode, hashedPassword] = await Promise.all([toHash(code, process.env.CODE_PEPPER!), toHash(password, process.env.PASSWORD_PEPPER)]);
+    const [hashedCode, hashedPassword] = await Promise.all([toHash(code + process.env.CODE_PEPPER!), toHash(password + process.env.PASSWORD_PEPPER)]);
     const verificationRequestValues = {
         email,
         hashedPassword,

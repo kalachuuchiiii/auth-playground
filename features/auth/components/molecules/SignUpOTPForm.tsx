@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,11 +9,11 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useCountdown } from "../../hooks/useCountdown";
-import type { AuthForm } from "../../schemas";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
 import type { OTPVerificationResponse } from "../../auth.types";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const SignUpOTPForm = () => {
     const [code, setCode] = useState("");
@@ -21,18 +21,26 @@ export const SignUpOTPForm = () => {
 
     const { secondsLeft, startTimer } = useCountdown(60);
     const { mutate: verifyCode } = useMutation({
-        mutationFn: async () => {
+        mutationFn: async (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
             if (secondsLeft > 0) return;
-            const res = await api.post<OTPVerificationResponse>(`/api/v1/auth/signup/otp/verify`, {
+            const promise = api.post<OTPVerificationResponse>(`/api/v1/auth/signup/otp/verify`, {
                 code
             })
+            toast.promise(promise, {
+                loading: "Verifying your email...",
+                error: "Invalid or expired verification code. Please try again.",
+                success: "Email verified successfully! Your account is ready.",
+            });
+            const res = await promise;
             startTimer();
             return res.data;
         },
         onSuccess: (data) => {
-            if (!data) return;
-            if (data.success) {
-
+            console.log('data', data);
+            if (!data || !data.success) return;
+            if (data.redirect && data.redirectTo) {
+                nav.push(data.redirectTo);
             }
         }
     })
@@ -40,9 +48,11 @@ export const SignUpOTPForm = () => {
 
     return (
         <form
-            onSubmit={() => verifyCode()}
+            id="otp-form"
+            onSubmit={(e) => verifyCode(e)}
             className="flex flex-col items-center gap-6 bg-transparent text-center text-neutral-100"
         >
+
             <div className="space-y-2">
                 <h1 className="text-2xl font-semibold">Verify your email</h1>
                 <p className="text-sm">
@@ -68,7 +78,7 @@ export const SignUpOTPForm = () => {
                 </InputOTPGroup>
             </InputOTP>
 
-            <Button type="submit" variant="default" disabled={code.length !== 6}>
+            <Button form="otp-form" type="submit" variant="default" disabled={code.length !== 6}>
                 Verify and create account
             </Button>
 
@@ -79,7 +89,7 @@ export const SignUpOTPForm = () => {
                 ) : (
                     <button
                         type="button"
-                        onClick={() => verifyCode()}
+
                         className="underline underline-offset-4 hover:opacity-80"
                     >
                         Resend code
